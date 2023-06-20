@@ -1,12 +1,27 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+// app.controller.ts
+import {
+  Controller,
+  Post,
+  UploadedFile,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
+import { AnyFilesInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
-@Controller()
+@Controller('')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly cloudinaryService: CloudinaryService) { }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadImage(@UploadedFile() file: Express.Multer.File) {
+    return this.cloudinaryService.uploadFile(file);
+  }
+
+  @Post('uploads')
+  @UseInterceptors(AnyFilesInterceptor())
+  uploadImages(@UploadedFiles() files: Array<Express.Multer.File>) {
+    return this.cloudinaryService.uploadFiles(files);
   }
 }
